@@ -1,3 +1,6 @@
+import os
+import re
+
 from flask import Flask
 from flask_restful import Api
 from flask_jwt import JWT
@@ -10,8 +13,12 @@ from resources.store import Store, StoreList
 
 app = Flask(__name__)
 
-# save the database in .db file in the current folder
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+# fixing the postgres bug
+uri = os.getenv("DATABASE_URL")
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.secret_key = 'jose'
 api = Api(app)
